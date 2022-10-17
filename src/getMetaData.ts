@@ -64,14 +64,14 @@ export function getMetaData() {
 export function deploysByDay() {
   const deploys = getMetaData();
   const depsByDay = groupBy(deploys, "deployDay");
-  const depsPerDay: { day: string; count: number }[] = [];
+  const depsPerDay: { day: string; goodCount: number; badCount: number }[] = [];
   const days = Object.keys(depsByDay);
 
   days.forEach((day, index) => {
     if (index === 0) {
       depsPerDay.push({
         day: day,
-        count: depsByDay[day].length,
+        ...getDeployTypes(depsByDay[day]),
       });
       return;
     }
@@ -85,15 +85,24 @@ export function deploysByDay() {
           day: addDays(new Date(previousDay), index + 1)
             .toISOString()
             .split("T")[0],
-          count: 0,
+          goodCount: 0,
+          badCount: 0,
         })
       );
     }
     // capture this data
     depsPerDay.push({
       day: day,
-      count: depsByDay[day].length,
+      ...getDeployTypes(depsByDay[day]),
     });
   });
   return depsPerDay;
+}
+
+function getDeployTypes(data: DeployMeta[]) {
+  const successes = data.filter((data) => data.type === "success").length;
+  return {
+    goodCount: successes,
+    badCount: data.length - successes,
+  };
 }

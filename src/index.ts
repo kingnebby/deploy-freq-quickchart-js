@@ -1,7 +1,7 @@
 import { getMetaData, deploysByDay } from "./getMetaData";
+import { chartDeployCount } from "./qchart";
 
 const deploys = getMetaData();
-console.log(deploys[0]);
 
 // Deploy Frequency Number
 const totalDeploys = deploys.length - 1;
@@ -10,4 +10,10 @@ console.log(`Deploy Success Rate: ${successDeploys / totalDeploys}`);
 
 // Deploy By Day
 const byDay = deploysByDay();
-console.log(byDay);
+// console.log(byDay);
+
+chartDeployCount(
+  byDay.map((el) => el.day),
+  byDay.map((el) => el.goodCount),
+  byDay.map((el) => el.badCount)
+);
